@@ -6,16 +6,15 @@ def find_columns_and_filters(table_headers, question):
     filters = {}
 
     column_patterns = {
-        "Year": r"\byear\b|\byears\b",
-        "Host": r"\bhost\b|\bhosts\b",
-        "Venues_Cities": r"\bvenue\b|\bvenues\b|\bcity\b|\bcities\b",
-        "Total_Attendance": r"\btotal attendance\b",
-        "Matches": r"\bmatch\b|\bmatches\b",
-        "Average_Attendance": r"\baverage attendance\b",
-        "Highest_Attendance_Number": r"\bhighest attendance\b",
-        "Highest_Attendance_Venue": r"\bvenue\b",
-        "Highest_Attendance_Games": r"\bgame\b|\bgames\b",
-        "Winner": r"\bwinner\b|\bwinners\b"
+        "Year": r"\b(years?|date|period)\b",
+        "Host": r"\b(hosts?|country|nation|where|location)\b",
+        "Venues_Cities": r"\b(venue|venues|city|cities|location|locations|place|places|where)\b",
+        "Total_Attendance": r"\b(total attendance|attendees|people)\b",
+        "Matches": r"\b(match|matches|game|games|finals)\b",
+        "Average_Attendance": r"\b(average attendance)\b",
+        "Highest_Attendance_Number": r"\b(highest attendance)\b",
+        "Highest_Attendance_Venue": r"\b(venue|stadium|stadiums)\b",
+        "Highest_Attendance_Games": r"\b(most watched game|finals)\b",
         # Ref: https://github.com/scrapinghub/dateparser/blob/master/dateparser/data/date_translation_data/en.py
     }
 
@@ -25,7 +24,11 @@ def find_columns_and_filters(table_headers, question):
             relevant_columns.append(header)
 
     year_match = re.search(r"\b\d{4}\b", question)
-    if year_match:
+    year_range_match = re.search(r"\b(\d{4})-(\d{4})\b", question)
+    if year_range_match:
+        start_year, end_year = year_range_match.groups()
+        filters["Year_Range"] = (start_year, end_year)
+    elif year_match:
         filters["Year"] = year_match.group()
 
     return relevant_columns, filters
