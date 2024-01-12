@@ -1,37 +1,31 @@
 import re
 
 
-def extract_information(table_headers, question):
-    column_name = []
+def find_columns_and_filters(table_headers, question):
+    relevant_columns = []
     filters = {}
 
-    year_pattern = r"\b(19|20)\d{2}\b"
-    country_city_pattern = r"in\s([A-Za-z\s]+)"
+    column_patterns = {
+        "Year": r"\byear\b|\byears\b",
+        "Host": r"\bhost\b|\bhosts\b",
+        "Venues_Cities": r"\bvenue\b|\bvenues\b|\bcity\b|\bcities\b",
+        "Total_Attendance": r"\btotal attendance\b",
+        "Matches": r"\bmatch\b|\bmatches\b",
+        "Average_Attendance": r"\baverage attendance\b",
+        "Highest_Attendance_Number": r"\bhighest attendance\b",
+        "Highest_Attendance_Venue": r"\bvenue\b",
+        "Highest_Attendance_Games": r"\bgame\b|\bgames\b",
+        "Winner": r"\bwinner\b|\bwinners\b"
+        # Ref: https://github.com/scrapinghub/dateparser/blob/master/dateparser/data/date_translation_data/en.py
+    }
 
-    year_match = re.search(year_pattern, question)
+    for header in table_headers:
+        pattern = column_patterns.get(header)
+        if pattern and re.search(pattern, question, re.IGNORECASE):
+            relevant_columns.append(header)
+
+    year_match = re.search(r"\b\d{4}\b", question)
     if year_match:
-        filters['Year'] = year_match.group()
+        filters["Year"] = year_match.group()
 
-    country_city_match = re.search(country_city_pattern, question)
-    if country_city_match:
-        filters['Host'] = country_city_match.group(1).strip()
-
-    if ('venue' in question.lower() or 'location' in question.lower()) and 'Venues_Cities' in table_headers:
-        column_name.append('Venues_Cities')
-    elif 'host' in question.lower():
-        column_name.append('Host')
-    elif 'attendance' in question.lower() and ('Total_Attendance' or 'Average_Attendance' or 'Highest_Attendance') in table_headers:
-        if 'average' in question.lower() and 'Average_Attendance' in table_headers:
-            column_name.append('Average Attendance')
-        elif 'total' in question.lower() and 'Total_Attendance' in table_headers:
-            column_name.append('Total Attendance')
-        elif ('highest' in question.lower() or 'most' in question.lower()) and 'Highest_Attendace':
-            column_name.append('Highest_Attendance')
-        else:
-            column_name.append('Total Attendance')
-    elif 'matches' in question.lower() and 'Matches' in table_headers:
-        column_name.append('Matches')
-    elif ('finalists' in question.lower() or 'winning scores' in question.lower()) and ('Highest_Attendance_Games' or 'Highest_Attendance_Venue' in table_headers):
-        column_name.append('Highest Attendance Games')
-
-    return column_name, filters
+    return relevant_columns, filters

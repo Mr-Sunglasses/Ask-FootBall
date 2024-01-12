@@ -1,7 +1,7 @@
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from InquirerPy.separator import Separator
-from ask_football.main import extract_information
+from ask_football.main import find_columns_and_filters
 
 
 def main():
@@ -24,4 +24,4 @@ def main():
     if table_headers:
         question = inquirer.text(message="Enter your Question:").execute()
 
-    print(extract_information(table_headers=table_headers, question=question))
+    print(find_columns_and_filters(table_headers, question))
