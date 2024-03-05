@@ -1,6 +1,6 @@
 [project]
 name = "Ask-FootBall"
-version = "0.1.2"
+version = "0.1.3"
 description = "Ask me"
 authors = [
     {name = "Kanishk Pachauri", email = "itskanishkp.py@gmail.com"},
